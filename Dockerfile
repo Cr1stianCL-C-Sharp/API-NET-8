@@ -9,18 +9,18 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy the project file and restore dependencies
-COPY ["MyApp/MyApp.csproj", "MyApp/"]
-RUN dotnet restore "MyApp/MyApp.csproj"
+COPY ["API/API.csproj", "API/"]
+RUN dotnet restore "API/API.csproj"
 
 # Copy the remaining source code
 COPY . .
 
-WORKDIR "/src/MyApp"
-RUN dotnet build "MyApp.csproj" -c Release -o /app/build
+WORKDIR "/src/API"
+RUN dotnet build "API.csproj" -c Release -o /app/build
 
 # Publish the application
 FROM build AS publish
-RUN dotnet publish "MyApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Final runtime image
 FROM base AS final
@@ -28,4 +28,4 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Set the entry point for the app
-ENTRYPOINT ["dotnet", "MyApp.dll"]
+ENTRYPOINT ["dotnet", "API.dll"]
